@@ -8,49 +8,78 @@
 #              that's called by a Hadoop Streaming process. The final result is compressed
 #              by BZip2 and stored back to HDFS.
 #
-#  usage: hadoop 
+#  I put it under Wine's directories. On my machine that is /home/matt/.wine/dosdevices/c:/Projects/nxcore
+#  then run the program with the following command with full paths to both files:
+#  wine c:\\Projects\\nxcore\\nxcore.exe c:\\Projects\\nxcore\\20140101.XA.nxc
+#
 #
 
-   # If no argument, stop processing.
-#if [ "$1" -eq "" ] 
-#then
-#	exit 0
-#fi
-
 FILEPATH=$1
+	
+	# Data directory on HDFS
+HDFS_DATA_DIR=hdfs://data/nxcore
 
-	#Set constants
-HDFS_UPLOAD_DIR=/nxcore/trade
-WINDOWS_APPLICATION_DIR=C:/Projects
+	# Linux HDFS Fuse directory mount
+HDFS_FUSE_DIR=/mnt/data
 
-	#Derive metadata. Filenames in the form of 20140101.XA.nxc
+	# Wine location holding NXCORE binaries
+WINDOWS_NXCORE_DIR=C:\\Projects\\nxcore
+	
+	# Wine location storing data. Need to symbolic link Linux HDFS directory to here.
+WINDOWS_DATA_DIR=C:\\Projects\\nxcore\\data
+
+	#Derive directory and file metadata. Filenames have the following form: 20140101.XA.nxc
 FILENAME="${FILEPATH##*/}"
 YEAR="${FILENAME:0:4}"
 MONTH="${FILENAME:4:2}"
 DAY="${FILENAME:6:2}"
 
 
-echo "Filepath: $FILEPATH"
-echo "Filename: $FILENAME"
-echo "Year: $YEAR"
-echo "Month: $MONTH"
-echo "Day: $DAY"
+echo "Processing $1..." > ./nxprocess.log
 
-echo "Processing $1..." > nxprocess.log
+if [ ! -d "~/.wine/dosdevices/$WINDOWS_DATA_DIR" ]; then
+	echo ln -s ${HDFS_FUSE_DIR} ${WINDOWS_DATA_DIR}
+fi
 
-echo "hadoop fs -copyToLocal $FILEPATH $FILENAME"
-echo wine $WINDOWS_APPLICATION_DIR/nxcore.exe $WINDOWS_APPLICATION_DIR/$FILENAME
+echo wine ${WINDOWS_NXCORE_DIR}\\nxcore.exe ${WINDOWS_DATA_DIR}\\${FILENAME}
 
-echo tar --bzip2 -C /processed/trade -cvf ${FILENAME}_TRADES.csv.tar ${FILENAME}_TRADES.CSV
-echo hadoop fs -moveFromLocal $FILENAME_TRADES.csv.tar.bz2 $HDFS_UPLOAD_DIR/$YEAR/$MONTH/$FILENAME_TRADES.csv.tar.bz2
+echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
+	  -Dmapred.output.compress=true \
+	  -Dmapred.compress.map.output=true \
+	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
+	  -Dmapred.reduce.tasks=0 \
+	  -input ${HDFS_DATA_DIR}/processed/trades/${FILENAME}_TRADES.CSV \
+	  -output ${HDFS_UPLOAD_DIR}/trades/${YEAR}/${MONTH}/${FILENAME}_TRADES.csv.tar.bz2 \
+	  -mapper "cut -f 2"
 
-echo tar --bzip2 -C /processed/exgquote -cvf $FILENAME_EXGQUOTE.csv.tar $FILENAME_EXGQUOTE.CSV
-echo hadoop fs -moveFromLocal $FILENAME_EXGQUOTE.csv.tar.bz2 $HDFS_UPLOAD_DIR/$YEAR/$MONTH/$FILENAME_EXGQUOTE.csv.tar.bz2
+echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
+	  -Dmapred.output.compress=true \
+	  -Dmapred.compress.map.output=true \
+	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
+	  -Dmapred.reduce.tasks=0 \
+	  -input ${HDFS_DATA_DIR}/processed/exgquote/${FILENAME}_EXGQUOTE.CSV \
+	  -output ${HDFS_UPLOAD_DIR}/exgquotes/${YEAR}/${MONTH}/${FILENAME}_EXGQUOTE.csv.tar.bz2 \
+	  -mapper "cut -f 2"
 
-echo tar --bzip2 -C /processed/mmquote -cvf $FILENAME_MMQUOTE.csv.tar $FILENAME_MMQUOTE.CSV
-echo hadoop fs -moveFromLocal $FILENAME_MMQUOTE.csv.tar.bz2 $HDFS_UPLOAD_DIR/$YEAR/$MONTH/$FILENAME_MMQUOTE.csv.tar.bz2
+echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
+	  -Dmapred.output.compress=true \
+	  -Dmapred.compress.map.output=true \
+	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
+	  -Dmapred.reduce.tasks=0 \
+	  -input ${HDFS_DATA_DIR}/processed/mmquote/${FILENAME}_MMQUOTE.CSV \
+	  -output ${HDFS_UPLOAD_DIR}/mmquotes/${YEAR}/${MONTH}/${FILENAME}_MMQUOTE.csv.tar.bz2 \
+	  -mapper "cut -f 2"
 
-echo tar --bzip2 -C /processed/symbolchange -cvf $FILENAME_SYMBOLCHANGE.csv.tar $FILENAME_SYMBOLCHANGE.CSV
-echo hadoop fs -moveFromLocal $FILENAME_SYMBOLCHANGE.csv.tar.bz2 $HDFS_UPLOAD_DIR/$YEAR/$MONTH/$FILENAME_SYMBOLCHANGE.csv.tar.bz2
+echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
+	  -Dmapred.output.compress=true \
+	  -Dmapred.compress.map.output=true \
+	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
+	  -Dmapred.reduce.tasks=0 \
+	  -input ${HDFS_DATA_DIR}/processed/symbolchange/${FILENAME}_SYMBOLCHANGE.CSV \
+	  -output ${HDFS_UPLOAD_DIR}/symbolchages/${YEAR}/${MONTH}/${FILENAME}_SYMBOLCHANGE.csv.tar.bz2 \
+	  -mapper "cut -f 2"
 
-echo rm -rf processed
+echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/trades/${FILENAME}_TRADES.CSV
+echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/exgquote/${FILENAME}_EXGQUOTE.CSV
+echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/mmquote/${FILENAME}_MMQUOTE.CSV
+echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/symbolchange/${FILENAME}_SYMBOLCHANGE.CSV
