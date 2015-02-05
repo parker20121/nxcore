@@ -18,8 +18,9 @@ FILEPATH=$1
 	
 	# Data directory on HDFS
 HDFS_DATA_DIR=hdfs://data/nxcore
+HDFS_UPLOAD_DIR=hdfs://SummerCamp2015/nxcore/decompressed
 
-	# Linux HDFS Fuse directory mount
+	# Linux HDFS Fuse mount path
 HDFS_FUSE_DIR=/mnt/data
 
 	# Wine location holding NXCORE binaries
@@ -35,7 +36,7 @@ MONTH="${FILENAME:4:2}"
 DAY="${FILENAME:6:2}"
 
 
-echo "Processing $1..." > ./nxprocess.log
+# echo "Processing $1..." > ./nxprocess.log
 
 if [ ! -d "~/.wine/dosdevices/$WINDOWS_DATA_DIR" ]; then
 	echo ln -s ${HDFS_FUSE_DIR} ${WINDOWS_DATA_DIR}
@@ -49,7 +50,7 @@ echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.ja
 	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
 	  -Dmapred.reduce.tasks=0 \
 	  -input ${HDFS_DATA_DIR}/processed/trades/${FILENAME}_TRADES.CSV \
-	  -output ${HDFS_UPLOAD_DIR}/trades/${YEAR}/${MONTH}/${FILENAME}_TRADES.csv.tar.bz2 \
+	  -output ${HDFS_UPLOAD_DIR}/trades/${YEAR}/${MONTH}/${FILENAME}_TRADES.csv.bz2 \
 	  -mapper "cut -f 2"
 
 echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
@@ -58,7 +59,7 @@ echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.ja
 	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
 	  -Dmapred.reduce.tasks=0 \
 	  -input ${HDFS_DATA_DIR}/processed/exgquote/${FILENAME}_EXGQUOTE.CSV \
-	  -output ${HDFS_UPLOAD_DIR}/exgquotes/${YEAR}/${MONTH}/${FILENAME}_EXGQUOTE.csv.tar.bz2 \
+	  -output ${HDFS_UPLOAD_DIR}/exgquotes/${YEAR}/${MONTH}/${FILENAME}_EXGQUOTE.csv.bz2 \
 	  -mapper "cut -f 2"
 
 echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
@@ -67,7 +68,7 @@ echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.ja
 	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
 	  -Dmapred.reduce.tasks=0 \
 	  -input ${HDFS_DATA_DIR}/processed/mmquote/${FILENAME}_MMQUOTE.CSV \
-	  -output ${HDFS_UPLOAD_DIR}/mmquotes/${YEAR}/${MONTH}/${FILENAME}_MMQUOTE.csv.tar.bz2 \
+	  -output ${HDFS_UPLOAD_DIR}/mmquotes/${YEAR}/${MONTH}/${FILENAME}_MMQUOTE.csv.bz2 \
 	  -mapper "cut -f 2"
 
 echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
@@ -76,7 +77,7 @@ echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.ja
 	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
 	  -Dmapred.reduce.tasks=0 \
 	  -input ${HDFS_DATA_DIR}/processed/symbolchange/${FILENAME}_SYMBOLCHANGE.CSV \
-	  -output ${HDFS_UPLOAD_DIR}/symbolchages/${YEAR}/${MONTH}/${FILENAME}_SYMBOLCHANGE.csv.tar.bz2 \
+	  -output ${HDFS_UPLOAD_DIR}/symbolchages/${YEAR}/${MONTH}/${FILENAME}_SYMBOLCHANGE.csv.bz2 \
 	  -mapper "cut -f 2"
 
 echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/trades/${FILENAME}_TRADES.CSV
