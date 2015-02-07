@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 
 #include "NxCoreAPI.h"
 #include "NxCoreAPI_class.h"
@@ -125,65 +126,65 @@ int processNxCoreTrade(const NxCoreSystem* pNxCoreSys, const NxCoreMessage* pNxC
 	//			Analysis SigHiLo Seconds, Analysis QteMatchDistanceRGN, Analysis QteMatchDistanceBBO,
 	//			Analysis QteMatchFlagsBBO, Analysis QteMatchFlagRGN, Analysis QteMatchTypeBBO,
 	//			Analysis QteMatchTypeRGN
-	outFiles.tradeStream << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
-	outFiles.tradeStream << setfill('0') << setw(2) << (int)d.Month << "-";
-	outFiles.tradeStream << setfill('0') << setw(2) << (int)d.Day << "\t";
-	outFiles.tradeStream << setfill('0') << setw(2) << (int)t.Hour << ":";		// System Time (HH:MM:SS.NNN)
-	outFiles.tradeStream << setfill('0') << setw(2) << (int)t.Minute << ":";
-	outFiles.tradeStream << setfill('0') << setw(2) << (int)t.Second << ".";
-	outFiles.tradeStream << setfill('0') << setw(3) << (int)t.Millisecond << "\t";
-	outFiles.tradeStream << (int)t.TimeZone << "\t";							// System Time Zone
-	outFiles.tradeStream << (int)d.DSTIndicator << "\t";						// DST Indicator
-	outFiles.tradeStream << (int)d.NDays << "\t";								// Number of Days since 1883-01-01
-	outFiles.tradeStream << (int)d.DayOfWeek << "\t";							// Day of Week
-	outFiles.tradeStream << (int)d.DayOfYear << "\t";							// Day of Year
-	outFiles.tradeStream << (int)ch.nxSessionDate.Year << "-";					// nxSessionDate
-	outFiles.tradeStream << setfill('0') << setw(2) << (int)ch.nxSessionDate.Month;
-	outFiles.tradeStream << "-" << setfill('0') << setw(2) << (int)ch.nxSessionDate.Day << "\t";
-	outFiles.tradeStream << (int)ch.nxSessionDate.DSTIndicator << "\t";			// Session DST Indicator
-	outFiles.tradeStream << (int)ch.nxSessionDate.NDays << "\t";				// Session Number of Days since 1883-01-01
-	outFiles.tradeStream << (int)ch.nxSessionDate.DayOfWeek << "\t";			// Session Day of Week
-	outFiles.tradeStream << (int)ch.nxSessionDate.DayOfYear << "\t";			// Session Day of Year
-	outFiles.tradeStream << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Hour << ":"; // nxExgTimestamp
-	outFiles.tradeStream << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Minute << ":";
-	outFiles.tradeStream << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Second << ".";
-	outFiles.tradeStream << setfill('0') << setw(3) << (int)ch.nxExgTimestamp.Millisecond << "\t";
-	outFiles.tradeStream << (int)ch.nxExgTimestamp.TimeZone << "\t";			// Exchange Timestamp Time Zone
-	outFiles.tradeStream << symbol << "\t";										// Symbol
-	outFiles.tradeStream << (int)ch.ListedExg << "\t";							// Listed Exchange Index
-	//outFiles.tradeStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ListedExg) << "\t";		// Listed Exchange
-	outFiles.tradeStream << (int)ch.ReportingExg << "\t";						// Reporting Exchange Index
-	//outFiles.tradeStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ReportingExg) << "\t";	// Reporting Exchange
-	outFiles.tradeStream << (int)ch.SessionID << "\t";							// Session ID
-	outFiles.tradeStream << (int)nt.PriceFlags << "\t";							// Trade Price Flags
-	outFiles.tradeStream << (int)nt.ConditionFlags << "\t";						// Trade ConditionFlag
-	outFiles.tradeStream << (int)nt.TradeCondition << "\t";						// Trade Condition Index
-	//outFiles.tradeStream << nxCoreClass.GetDefinedString(NxST_TRADECONDITION, nt.TradeCondition) << "\t";	// Trade Condition
-	outFiles.tradeStream << (int)nt.VolumeType << "\t";							// Trade Volume Type
-	outFiles.tradeStream << nt.BATECode << "\t";								// Trade BATE Code 
-	outFiles.tradeStream << nt.Size << "\t";									// Trade Size
-	outFiles.tradeStream << nt.ExgSequence << "\t";								// Trade ExgSequence
-	outFiles.tradeStream << nt.RecordsBack << "\t";								// Trade RecordsBack
-	outFiles.tradeStream << nt.TotalVolume << "\t";								// Trade Total Volume
-	outFiles.tradeStream << nt.TickVolume << "\t";								// Trade Tick Volume
-	outFiles.tradeStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Price, nt.PriceType) << "\t";	// Trade Price
-	outFiles.tradeStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Open, nt.PriceType) << "\t";	// Trade Open
-	outFiles.tradeStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.High, nt.PriceType) << "\t";	// Trade High
-	outFiles.tradeStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Low, nt.PriceType) << "\t";	// Trade Low
-	outFiles.tradeStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Last, nt.PriceType) << "\t";	// Trade Last
-	outFiles.tradeStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Tick, nt.PriceType) << "\t";	// Trade Tick
-	outFiles.tradeStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.NetChange, nt.PriceType) << "\t";	// Trade Net Change
-	outFiles.tradeStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.nxAnalysis.FilterThreshold, nt.PriceType) << "\t";	// Analysis Filter Threshold
-	outFiles.tradeStream << (int)nt.nxAnalysis.Filtered << "\t";				// Analysis Filtered Bool
-	outFiles.tradeStream << (int)nt.nxAnalysis.FilterLevel << "\t";				// Analysis Filter Level
-	outFiles.tradeStream << (int)nt.nxAnalysis.SigHiLoType << "\t";				// Analysis SigHiLo Type
-	outFiles.tradeStream << nt.nxAnalysis.SigHiLoSeconds << "\t";				// Analysis SigHiLo Seconds
-	outFiles.tradeStream << nt.nxAnalysis.QteMatchDistanceRGN << "\t";			// Analysis QteMatchDistanceRGN
-	outFiles.tradeStream << nt.nxAnalysis.QteMatchDistanceBBO << "\t";			// Analysis QteMatchDistanceBBO
-	outFiles.tradeStream << (int)nt.nxAnalysis.QteMatchFlagsBBO << "\t";		// Analysis QteMatchFlagsBBO
-	outFiles.tradeStream << (int)nt.nxAnalysis.QteMatchFlagsRGN << "\t";		// Analysis QteMatchFlagRGN
-	outFiles.tradeStream << (int)nt.nxAnalysis.QteMatchTypeBBO << "\t";			// Analysis QteMatchTypeBBO
-	outFiles.tradeStream << (int)nt.nxAnalysis.QteMatchTypeRGN << "\n";	       // Analysis QteMatchTypeRGN
+	cout << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
+	cout << setfill('0') << setw(2) << (int)d.Month << "-";
+	cout << setfill('0') << setw(2) << (int)d.Day << "\t";
+	cout << setfill('0') << setw(2) << (int)t.Hour << ":";		// System Time (HH:MM:SS.NNN)
+	cout << setfill('0') << setw(2) << (int)t.Minute << ":";
+	cout << setfill('0') << setw(2) << (int)t.Second << ".";
+	cout << setfill('0') << setw(3) << (int)t.Millisecond << "\t";
+	cout << (int)t.TimeZone << "\t";							// System Time Zone
+	cout << (int)d.DSTIndicator << "\t";						// DST Indicator
+	cout << (int)d.NDays << "\t";								// Number of Days since 1883-01-01
+	cout << (int)d.DayOfWeek << "\t";							// Day of Week
+	cout << (int)d.DayOfYear << "\t";							// Day of Year
+	cout << (int)ch.nxSessionDate.Year << "-";					// nxSessionDate
+	cout << setfill('0') << setw(2) << (int)ch.nxSessionDate.Month;
+	cout << "-" << setfill('0') << setw(2) << (int)ch.nxSessionDate.Day << "\t";
+	cout << (int)ch.nxSessionDate.DSTIndicator << "\t";			// Session DST Indicator
+	cout << (int)ch.nxSessionDate.NDays << "\t";				// Session Number of Days since 1883-01-01
+	cout << (int)ch.nxSessionDate.DayOfWeek << "\t";			// Session Day of Week
+	cout << (int)ch.nxSessionDate.DayOfYear << "\t";			// Session Day of Year
+	cout << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Hour << ":"; // nxExgTimestamp
+	cout << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Minute << ":";
+	cout << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Second << ".";
+	cout << setfill('0') << setw(3) << (int)ch.nxExgTimestamp.Millisecond << "\t";
+	cout << (int)ch.nxExgTimestamp.TimeZone << "\t";			// Exchange Timestamp Time Zone
+	cout << symbol << "\t";										// Symbol
+	cout << (int)ch.ListedExg << "\t";							// Listed Exchange Index
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ListedExg) << "\t";		// Listed Exchange
+	cout << (int)ch.ReportingExg << "\t";						// Reporting Exchange Index
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ReportingExg) << "\t";	// Reporting Exchange
+	cout << (int)ch.SessionID << "\t";							// Session ID
+	cout << (int)nt.PriceFlags << "\t";							// Trade Price Flags
+	cout << (int)nt.ConditionFlags << "\t";						// Trade ConditionFlag
+	cout << (int)nt.TradeCondition << "\t";						// Trade Condition Index
+	//cout << nxCoreClass.GetDefinedString(NxST_TRADECONDITION, nt.TradeCondition) << "\t";	// Trade Condition
+	cout << (int)nt.VolumeType << "\t";							// Trade Volume Type
+	cout << nt.BATECode << "\t";								// Trade BATE Code 
+	cout << nt.Size << "\t";									// Trade Size
+	cout << nt.ExgSequence << "\t";								// Trade ExgSequence
+	cout << nt.RecordsBack << "\t";								// Trade RecordsBack
+	cout << nt.TotalVolume << "\t";								// Trade Total Volume
+	cout << nt.TickVolume << "\t";								// Trade Tick Volume
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Price, nt.PriceType) << "\t";	// Trade Price
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Open, nt.PriceType) << "\t";	// Trade Open
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.High, nt.PriceType) << "\t";	// Trade High
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Low, nt.PriceType) << "\t";	// Trade Low
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Last, nt.PriceType) << "\t";	// Trade Last
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.Tick, nt.PriceType) << "\t";	// Trade Tick
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.NetChange, nt.PriceType) << "\t";	// Trade Net Change
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(nt.nxAnalysis.FilterThreshold, nt.PriceType) << "\t";	// Analysis Filter Threshold
+	cout << (int)nt.nxAnalysis.Filtered << "\t";				// Analysis Filtered Bool
+	cout << (int)nt.nxAnalysis.FilterLevel << "\t";				// Analysis Filter Level
+	cout << (int)nt.nxAnalysis.SigHiLoType << "\t";				// Analysis SigHiLo Type
+	cout << nt.nxAnalysis.SigHiLoSeconds << "\t";				// Analysis SigHiLo Seconds
+	cout << nt.nxAnalysis.QteMatchDistanceRGN << "\t";			// Analysis QteMatchDistanceRGN
+	cout << nt.nxAnalysis.QteMatchDistanceBBO << "\t";			// Analysis QteMatchDistanceBBO
+	cout << (int)nt.nxAnalysis.QteMatchFlagsBBO << "\t";		// Analysis QteMatchFlagsBBO
+	cout << (int)nt.nxAnalysis.QteMatchFlagsRGN << "\t";		// Analysis QteMatchFlagRGN
+	cout << (int)nt.nxAnalysis.QteMatchTypeBBO << "\t";			// Analysis QteMatchTypeBBO
+	cout << (int)nt.nxAnalysis.QteMatchTypeRGN << "\n";	       // Analysis QteMatchTypeRGN
 
 	return NxCALLBACKRETURN_CONTINUE;
 }
@@ -198,79 +199,79 @@ int processNxCoreExgQuote(const NxCoreSystem* pNxCoreSys, const NxCoreMessage* p
 	getSymbol(pNxCoreMsg, symbol);
 
 	// Output
-	outFiles.qExgStream << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
-	outFiles.qExgStream << setfill('0') << setw(2) << (int)d.Month << "-";
-	outFiles.qExgStream << setfill('0') << setw(2) << (int)d.Day << "\t";
-	outFiles.qExgStream << setfill('0') << setw(2) << (int)t.Hour << ":";		// System Time (HH:MM:SS.NNN)
-	outFiles.qExgStream << setfill('0') << setw(2) << (int)t.Minute << ":";
-	outFiles.qExgStream << setfill('0') << setw(2) << (int)t.Second << ".";
-	outFiles.qExgStream << setfill('0') << setw(3) << (int)t.Millisecond << "\t";
-	outFiles.qExgStream << (int)t.TimeZone << "\t";							// System Time Zone
-	outFiles.qExgStream << (int)d.DSTIndicator << "\t";						// DST Indicator
-	outFiles.qExgStream << (int)d.NDays << "\t";								// Number of Days since 1883-01-01
-	outFiles.qExgStream << (int)d.DayOfWeek << "\t";							// Day of Week
-	outFiles.qExgStream << (int)d.DayOfYear << "\t";							// Day of Year
-	outFiles.qExgStream << (int)ch.nxSessionDate.Year << "-";					// nxSessionDate
-	outFiles.qExgStream << setfill('0') << setw(2) << (int)ch.nxSessionDate.Month;
-	outFiles.qExgStream << "-" << setfill('0') << setw(2) << (int)ch.nxSessionDate.Day << "\t";
-	outFiles.qExgStream << (int)ch.nxSessionDate.DSTIndicator << "\t";			// Session DST Indicator
-	outFiles.qExgStream << (int)ch.nxSessionDate.NDays << "\t";				// Session Number of Days since 1883-01-01
-	outFiles.qExgStream << (int)ch.nxSessionDate.DayOfWeek << "\t";			// Session Day of Week
-	outFiles.qExgStream << (int)ch.nxSessionDate.DayOfYear << "\t";			// Session Day of Year
-	outFiles.qExgStream << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Hour << ":"; // nxExgTimestamp
-	outFiles.qExgStream << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Minute << ":";
-	outFiles.qExgStream << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Second << ".";
-	outFiles.qExgStream << setfill('0') << setw(3) << (int)ch.nxExgTimestamp.Millisecond << "\t";
-	outFiles.qExgStream << (int)ch.nxExgTimestamp.TimeZone << "\t";			// Exchange Timestamp Time Zone
-	outFiles.qExgStream << symbol << "\t";										// Symbol
-	outFiles.qExgStream << (int)ch.ListedExg << "\t";							// Listed Exchange Index
-	//outFiles.qExgStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ListedExg) << "\t";		// Listed Exchange
-	outFiles.qExgStream << (int)ch.ReportingExg << "\t";						// Reporting Exchange Index
-	//outFiles.qExgStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ReportingExg) << "\t";	// Reporting Exchange
-	outFiles.qExgStream << (int)ch.SessionID << "\t";							// Session ID
-	//outFiles.qExgStream << (int)cq.AskPrice << "\t";
-	outFiles.qExgStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble((int)cq.AskPrice, cq.PriceType) << "\t";
-	//outFiles.qExgStream << (int)cq.AskPriceChange << "\t";
-	outFiles.qExgStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble((int)cq.AskPriceChange, cq.PriceType) << "\t";
-	outFiles.qExgStream << (int)cq.AskSize << "\t";
-	outFiles.qExgStream << (int)cq.AskSizeChange << "\t";
-	//outFiles.qExgStream << (int)cq.BidPrice << "\t";
-	outFiles.qExgStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(cq.BidPrice, cq.PriceType) << "\t";
-	//outFiles.qExgStream << (int)cq.BidPriceChange << "\t";
-	outFiles.qExgStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(cq.BidPriceChange, cq.PriceType) << "\t";
-	outFiles.qExgStream << (int)cq.BidSize << "\t";
-	outFiles.qExgStream << (int)cq.BidSizeChange << "\t";
-	outFiles.qExgStream << (int)cq.NasdaqBidTick << "\t";
-	outFiles.qExgStream << (int)cq.PriceType << "\t";
-	outFiles.qExgStream << (int)cq.QuoteCondition << "\t";
-	//outFiles.qExgStream << nxCoreClass.GetDefinedString(NxST_QUOTECONDITION, cq.QuoteCondition) << "\t";
-	outFiles.qExgStream << (int)cq.Refresh << "\t";
-	outFiles.qExgStream << (int)eq.BBOChangeFlags << "\t";
-	outFiles.qExgStream << (int)eq.BestAskCondition << "\t";
-	//outFiles.qExgStream << nxCoreClass.GetDefinedString(NxST_QUOTECONDITION, cq.QuoteCondition) << "\t";
-	outFiles.qExgStream << (int)eq.BestAskExg << "\t";
-	//outFiles.qExgStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, eq.BestAskExg) << "\t";
-	//outFiles.qExgStream << (int)eq.BestAskPrice << "\t";
-	outFiles.qExgStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(eq.BestAskPrice, cq.PriceType) << "\t";
-	//outFiles.qExgStream << (int)eq.BestAskPriceChange << "\t";
-	outFiles.qExgStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(eq.BestAskPriceChange, cq.PriceType) << "\t";
-	outFiles.qExgStream << (int)eq.BestAskSize << "\t";
-	outFiles.qExgStream << (int)eq.BestAskSizeChange << "\t";
-	outFiles.qExgStream << (int)eq.BestBidCondition << "\t";
-	//outFiles.qExgStream << nxCoreClass.GetDefinedString(NxST_QUOTECONDITION, eq.BestBidCondition) << "\t";
-	outFiles.qExgStream << (int)eq.BestBidExg << "\t";
-	//outFiles.qExgStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, eq.BestBidExg) << "\t";
-	//outFiles.qExgStream << (int)eq.BestBidPrice << "\t";
-	outFiles.qExgStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(eq.BestBidPrice, cq.PriceType) << "\t";
-	//outFiles.qExgStream << (int)eq.BestBidPriceChange << "\t";
-	outFiles.qExgStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(eq.BestBidPriceChange, cq.PriceType) << "\t";
-	outFiles.qExgStream << (int)eq.BestBidSize << "\t";
-	outFiles.qExgStream << (int)eq.BestBidSizeChange << "\t";
-	outFiles.qExgStream << (int)eq.ClosingQuoteFlag << "\t";
-	outFiles.qExgStream << (int)eq.PrevBestAskExg << "\t";
-	//outFiles.qExgStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, eq.PrevBestAskExg) << "\t";
-	outFiles.qExgStream << (int)eq.PrevBestBidExg << "\n";
-	//outFiles.qExgStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, eq.PrevBestBidExg) << "\n";
+	cout << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
+	cout << setfill('0') << setw(2) << (int)d.Month << "-";
+	cout << setfill('0') << setw(2) << (int)d.Day << "\t";
+	cout << setfill('0') << setw(2) << (int)t.Hour << ":";		// System Time (HH:MM:SS.NNN)
+	cout << setfill('0') << setw(2) << (int)t.Minute << ":";
+	cout << setfill('0') << setw(2) << (int)t.Second << ".";
+	cout << setfill('0') << setw(3) << (int)t.Millisecond << "\t";
+	cout << (int)t.TimeZone << "\t";							// System Time Zone
+	cout << (int)d.DSTIndicator << "\t";						// DST Indicator
+	cout << (int)d.NDays << "\t";								// Number of Days since 1883-01-01
+	cout << (int)d.DayOfWeek << "\t";							// Day of Week
+	cout << (int)d.DayOfYear << "\t";							// Day of Year
+	cout << (int)ch.nxSessionDate.Year << "-";					// nxSessionDate
+	cout << setfill('0') << setw(2) << (int)ch.nxSessionDate.Month;
+	cout << "-" << setfill('0') << setw(2) << (int)ch.nxSessionDate.Day << "\t";
+	cout << (int)ch.nxSessionDate.DSTIndicator << "\t";			// Session DST Indicator
+	cout << (int)ch.nxSessionDate.NDays << "\t";				// Session Number of Days since 1883-01-01
+	cout << (int)ch.nxSessionDate.DayOfWeek << "\t";			// Session Day of Week
+	cout << (int)ch.nxSessionDate.DayOfYear << "\t";			// Session Day of Year
+	cout << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Hour << ":"; // nxExgTimestamp
+	cout << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Minute << ":";
+	cout << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Second << ".";
+	cout << setfill('0') << setw(3) << (int)ch.nxExgTimestamp.Millisecond << "\t";
+	cout << (int)ch.nxExgTimestamp.TimeZone << "\t";			// Exchange Timestamp Time Zone
+	cout << symbol << "\t";										// Symbol
+	cout << (int)ch.ListedExg << "\t";							// Listed Exchange Index
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ListedExg) << "\t";		// Listed Exchange
+	cout << (int)ch.ReportingExg << "\t";						// Reporting Exchange Index
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ReportingExg) << "\t";	// Reporting Exchange
+	cout << (int)ch.SessionID << "\t";							// Session ID
+	//cout << (int)cq.AskPrice << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble((int)cq.AskPrice, cq.PriceType) << "\t";
+	//cout << (int)cq.AskPriceChange << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble((int)cq.AskPriceChange, cq.PriceType) << "\t";
+	cout << (int)cq.AskSize << "\t";
+	cout << (int)cq.AskSizeChange << "\t";
+	//cout << (int)cq.BidPrice << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(cq.BidPrice, cq.PriceType) << "\t";
+	//cout << (int)cq.BidPriceChange << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(cq.BidPriceChange, cq.PriceType) << "\t";
+	cout << (int)cq.BidSize << "\t";
+	cout << (int)cq.BidSizeChange << "\t";
+	cout << (int)cq.NasdaqBidTick << "\t";
+	cout << (int)cq.PriceType << "\t";
+	cout << (int)cq.QuoteCondition << "\t";
+	//cout << nxCoreClass.GetDefinedString(NxST_QUOTECONDITION, cq.QuoteCondition) << "\t";
+	cout << (int)cq.Refresh << "\t";
+	cout << (int)eq.BBOChangeFlags << "\t";
+	cout << (int)eq.BestAskCondition << "\t";
+	//cout << nxCoreClass.GetDefinedString(NxST_QUOTECONDITION, cq.QuoteCondition) << "\t";
+	cout << (int)eq.BestAskExg << "\t";
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, eq.BestAskExg) << "\t";
+	//cout << (int)eq.BestAskPrice << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(eq.BestAskPrice, cq.PriceType) << "\t";
+	//cout << (int)eq.BestAskPriceChange << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(eq.BestAskPriceChange, cq.PriceType) << "\t";
+	cout << (int)eq.BestAskSize << "\t";
+	cout << (int)eq.BestAskSizeChange << "\t";
+	cout << (int)eq.BestBidCondition << "\t";
+	//cout << nxCoreClass.GetDefinedString(NxST_QUOTECONDITION, eq.BestBidCondition) << "\t";
+	cout << (int)eq.BestBidExg << "\t";
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, eq.BestBidExg) << "\t";
+	//cout << (int)eq.BestBidPrice << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(eq.BestBidPrice, cq.PriceType) << "\t";
+	//cout << (int)eq.BestBidPriceChange << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(eq.BestBidPriceChange, cq.PriceType) << "\t";
+	cout << (int)eq.BestBidSize << "\t";
+	cout << (int)eq.BestBidSizeChange << "\t";
+	cout << (int)eq.ClosingQuoteFlag << "\t";
+	cout << (int)eq.PrevBestAskExg << "\t";
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, eq.PrevBestAskExg) << "\t";
+	cout << (int)eq.PrevBestBidExg << "\n";
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, eq.PrevBestBidExg) << "\n";
 
 	return NxCALLBACKRETURN_CONTINUE;
 }
@@ -287,56 +288,56 @@ int processNxCoreMMQuote(const NxCoreSystem* pNxCoreSys, const NxCoreMessage* pN
 	char* p = buf;
 
 	// Output
-	outFiles.qMmStream << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
-	outFiles.qMmStream << setfill('0') << setw(2) << (int)d.Month << "-";
-	outFiles.qMmStream << setfill('0') << setw(2) << (int)d.Day << "\t";
-	outFiles.qMmStream << setfill('0') << setw(2) << (int)t.Hour << ":";		// System Time (HH:MM:SS.NNN)
-	outFiles.qMmStream << setfill('0') << setw(2) << (int)t.Minute << ":";
-	outFiles.qMmStream << setfill('0') << setw(2) << (int)t.Second << ".";
-	outFiles.qMmStream << setfill('0') << setw(3) << (int)t.Millisecond << "\t";
-	outFiles.qMmStream << (int)t.TimeZone << "\t";							// System Time Zone
-	outFiles.qMmStream << (int)d.DSTIndicator << "\t";						// DST Indicator
-	outFiles.qMmStream << (int)d.NDays << "\t";								// Number of Days since 1883-01-01
-	outFiles.qMmStream << (int)d.DayOfWeek << "\t";							// Day of Week
-	outFiles.qMmStream << (int)d.DayOfYear << "\t";							// Day of Year
-	outFiles.qMmStream << (int)ch.nxSessionDate.Year << "-";					// nxSessionDate
-	outFiles.qMmStream << setfill('0') << setw(2) << (int)ch.nxSessionDate.Month;
-	outFiles.qMmStream << "-" << setfill('0') << setw(2) << (int)ch.nxSessionDate.Day << "\t";
-	outFiles.qMmStream << (int)ch.nxSessionDate.DSTIndicator << "\t";			// Session DST Indicator
-	outFiles.qMmStream << (int)ch.nxSessionDate.NDays << "\t";				// Session Number of Days since 1883-01-01
-	outFiles.qMmStream << (int)ch.nxSessionDate.DayOfWeek << "\t";			// Session Day of Week
-	outFiles.qMmStream << (int)ch.nxSessionDate.DayOfYear << "\t";			// Session Day of Year
-	outFiles.qMmStream << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Hour << ":"; // nxExgTimestamp
-	outFiles.qMmStream << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Minute << ":";
-	outFiles.qMmStream << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Second << ".";
-	outFiles.qMmStream << setfill('0') << setw(3) << (int)ch.nxExgTimestamp.Millisecond << "\t";
-	outFiles.qMmStream << (int)ch.nxExgTimestamp.TimeZone << "\t";			// Exchange Timestamp Time Zone
-	outFiles.qMmStream << symbol << "\t";										// Symbol
-	outFiles.qMmStream << (int)ch.ListedExg << "\t";							// Listed Exchange Index
-	//outFiles.qMmStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ListedExg) << "\t";		// Listed Exchange
-	outFiles.qMmStream << (int)ch.ReportingExg << "\t";						// Reporting Exchange Index
-	//outFiles.qMmStream << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ReportingExg) << "\t";	// Reporting Exchange
-	outFiles.qMmStream << (int)ch.SessionID << "\t";							// Session ID
-	//outFiles.qMmStream << (int)cq.AskPrice << "\t";
-	outFiles.qMmStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble((int)cq.AskPrice, cq.PriceType) << "\t";
-	//outFiles.qMmStream << (int)cq.AskPriceChange << "\t";
-	outFiles.qMmStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble((int)cq.AskPriceChange, cq.PriceType) << "\t";
-	outFiles.qMmStream << (int)cq.AskSize << "\t";
-	outFiles.qMmStream << (int)cq.AskSizeChange << "\t";
-	//outFiles.qMmStream << (int)cq.BidPrice << "\t";
-	outFiles.qMmStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(cq.BidPrice, cq.PriceType) << "\t";
-	//outFiles.qMmStream << (int)cq.BidPriceChange << "\t";
-	outFiles.qMmStream << fixed << setprecision(3) << nxCoreClass.PriceToDouble(cq.BidPriceChange, cq.PriceType) << "\t";
-	outFiles.qMmStream << (int)cq.BidSize << "\t";
-	outFiles.qMmStream << (int)cq.BidSizeChange << "\t";
-	outFiles.qMmStream << (int)cq.NasdaqBidTick << "\t";
-	outFiles.qMmStream << (int)cq.PriceType << "\t";
-	outFiles.qMmStream << (int)cq.QuoteCondition << "\t";
-	//outFiles.qMmStream << nxCoreClass.GetDefinedString(NxST_QUOTECONDITION, cq.QuoteCondition) << "\t";
-	outFiles.qMmStream << (int)cq.Refresh << "\t";
-	outFiles.qMmStream << (int)mm.MarketMakerType << "\t";
-	outFiles.qMmStream << mm.pnxStringMarketMaker->String << "\t";
-	outFiles.qMmStream << (int)mm.QuoteType << "\n";
+	cout << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
+	cout << setfill('0') << setw(2) << (int)d.Month << "-";
+	cout << setfill('0') << setw(2) << (int)d.Day << "\t";
+	cout << setfill('0') << setw(2) << (int)t.Hour << ":";		// System Time (HH:MM:SS.NNN)
+	cout << setfill('0') << setw(2) << (int)t.Minute << ":";
+	cout << setfill('0') << setw(2) << (int)t.Second << ".";
+	cout << setfill('0') << setw(3) << (int)t.Millisecond << "\t";
+	cout << (int)t.TimeZone << "\t";							// System Time Zone
+	cout << (int)d.DSTIndicator << "\t";						// DST Indicator
+	cout << (int)d.NDays << "\t";								// Number of Days since 1883-01-01
+	cout << (int)d.DayOfWeek << "\t";							// Day of Week
+	cout << (int)d.DayOfYear << "\t";							// Day of Year
+	cout << (int)ch.nxSessionDate.Year << "-";					// nxSessionDate
+	cout << setfill('0') << setw(2) << (int)ch.nxSessionDate.Month;
+	cout << "-" << setfill('0') << setw(2) << (int)ch.nxSessionDate.Day << "\t";
+	cout << (int)ch.nxSessionDate.DSTIndicator << "\t";			// Session DST Indicator
+	cout << (int)ch.nxSessionDate.NDays << "\t";				// Session Number of Days since 1883-01-01
+	cout << (int)ch.nxSessionDate.DayOfWeek << "\t";			// Session Day of Week
+	cout << (int)ch.nxSessionDate.DayOfYear << "\t";			// Session Day of Year
+	cout << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Hour << ":"; // nxExgTimestamp
+	cout << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Minute << ":";
+	cout << setfill('0') << setw(2) << (int)ch.nxExgTimestamp.Second << ".";
+	cout << setfill('0') << setw(3) << (int)ch.nxExgTimestamp.Millisecond << "\t";
+	cout << (int)ch.nxExgTimestamp.TimeZone << "\t";			// Exchange Timestamp Time Zone
+	cout << symbol << "\t";										// Symbol
+	cout << (int)ch.ListedExg << "\t";							// Listed Exchange Index
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ListedExg) << "\t";		// Listed Exchange
+	cout << (int)ch.ReportingExg << "\t";						// Reporting Exchange Index
+	//cout << nxCoreClass.GetDefinedString(NxST_EXCHANGE, ch.ReportingExg) << "\t";	// Reporting Exchange
+	cout << (int)ch.SessionID << "\t";							// Session ID
+	//cout << (int)cq.AskPrice << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble((int)cq.AskPrice, cq.PriceType) << "\t";
+	//cout << (int)cq.AskPriceChange << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble((int)cq.AskPriceChange, cq.PriceType) << "\t";
+	cout << (int)cq.AskSize << "\t";
+	cout << (int)cq.AskSizeChange << "\t";
+	//cout << (int)cq.BidPrice << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(cq.BidPrice, cq.PriceType) << "\t";
+	//cout << (int)cq.BidPriceChange << "\t";
+	cout << fixed << setprecision(3) << nxCoreClass.PriceToDouble(cq.BidPriceChange, cq.PriceType) << "\t";
+	cout << (int)cq.BidSize << "\t";
+	cout << (int)cq.BidSizeChange << "\t";
+	cout << (int)cq.NasdaqBidTick << "\t";
+	cout << (int)cq.PriceType << "\t";
+	cout << (int)cq.QuoteCondition << "\t";
+	//cout << nxCoreClass.GetDefinedString(NxST_QUOTECONDITION, cq.QuoteCondition) << "\t";
+	cout << (int)cq.Refresh << "\t";
+	cout << (int)mm.MarketMakerType << "\t";
+	cout << mm.pnxStringMarketMaker->String << "\t";
+	cout << (int)mm.QuoteType << "\n";
 
 	return NxCALLBACKRETURN_CONTINUE;
 }
@@ -383,10 +384,10 @@ int processNxCoreSymbolChange(const NxCoreSystem* pNxCoreSys, const NxCoreMessag
 		break;
 	}
 	}
-	outFiles.symStream << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
-	outFiles.symStream << setfill('0') << setw(2) << (int)d.Month << "-";
-	outFiles.symStream << setfill('0') << setw(2) << (int)d.Day << "\t";
-	outFiles.symStream << outString << "\n";
+	cout << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
+	cout << setfill('0') << setw(2) << (int)d.Month << "-";
+	cout << setfill('0') << setw(2) << (int)d.Day << "\t";
+	cout << outString << "\n";
 	return NxCALLBACKRETURN_CONTINUE;
 }
 int __stdcall OnNxCoreCallback(const NxCoreSystem* pNxCoreSys, const NxCoreMessage* pNxCoreMsg)
@@ -420,12 +421,12 @@ int main(int argc, char** argv)
 	}
 
 	// Create Output Directories
-	_splitpath(argv[1], drive, dir, fname, ext);
-	sprintf(outputdir, "%s%s\\processed\\", drive, dir);
-	sprintf(outputInfo.tradedir, "%s\\trade", outputdir);
-	sprintf(outputInfo.exgquotedir, "%s\\exgquote", outputdir);
-	sprintf(outputInfo.mmquotedir, "%s\\mmquote", outputdir);
-	sprintf(outputInfo.symboldir, "%s\\symbolchange", outputdir);
+	//_splitpath(argv[1], drive, dir, fname, ext);
+	//sprintf(outputdir, "%s%s\\processed\\", drive, dir);
+	//sprintf(outputInfo.tradedir, "%s\\trade", outputdir);
+	//sprintf(outputInfo.exgquotedir, "%s\\exgquote", outputdir);
+	//sprintf(outputInfo.mmquotedir, "%s\\mmquote", outputdir);
+	//sprintf(outputInfo.symboldir, "%s\\symbolchange", outputdir);
 
 	//
 	// Leave these commented out since they overwrite the permissions
@@ -445,10 +446,10 @@ int main(int argc, char** argv)
 	//sprintf(outputInfo.symbolfname, "%s\\%s_SYMBOLCHANGE.csv", outputInfo.symboldir, fname);
 
 	// Open File Handles
-	outFiles.tradeStream.open(outputInfo.tradefname,std::ios::app);
-	outFiles.qExgStream.open(outputInfo.exgquotefname, std::ios::app);
-	outFiles.qMmStream.open(outputInfo.mmquotefname, std::ios::app);
-	outFiles.symStream.open(outputInfo.symbolfname, std::ios::app);
+	//outFiles.tradeStream.open(outputInfo.tradefname,std::ios::app);
+	//outFiles.qExgStream.open(outputInfo.exgquotefname, std::ios::app);
+	//outFiles.qMmStream.open(outputInfo.mmquotefname, std::ios::app);
+	//outFiles.symStream.open(outputInfo.symbolfname, std::ios::app);
 
 	printf("Directory: %s%s\tTape: %s%s\n", drive, dir, fname, ext);
 	//nxCoreClass.ProcessTape(argv[1], 0, NxCF_EXCLUDE_CRC_CHECK+NxCF_EXCLUDE_QUOTES+NxCF_EXCLUDE_QUOTES2+NxCF_EXCLUDE_OPRA, 0, OnNxCoreCallback);
@@ -456,10 +457,10 @@ int main(int argc, char** argv)
 	//nxCoreClass.ProcessTape(argv[1], 0, NxCF_EXCLUDE_CRC_CHECK + NxCF_EXCLUDE_QUOTES2, 0, OnNxCoreCallback);
 	//nxCoreClass.ProcessTape(argv[1], 0, NxCF_EXCLUDE_CRC_CHECK + NxCF_EXCLUDE_QUOTES, 0, OnNxCoreCallback);
 	// Close File Handles
-	outFiles.tradeStream.close();
-	outFiles.qExgStream.close();
-	outFiles.qMmStream.close();
-	outFiles.symStream.close();
+	//outFiles.tradeStream.close();
+	//outFiles.qExgStream.close();
+	//outFiles.qMmStream.close();
+	//outFiles.symStream.close();
 
 	return 0;
 }
