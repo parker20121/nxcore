@@ -427,11 +427,16 @@ int main(int argc, char** argv)
 	sprintf(outputInfo.mmquotedir, "%s\\mmquote", outputdir);
 	sprintf(outputInfo.symboldir, "%s\\symbolchange", outputdir);
 
-	_mkdir(outputdir);
-	_mkdir(outputInfo.tradedir);
-	_mkdir(outputInfo.exgquotedir);
-	_mkdir(outputInfo.mmquotedir);
-	_mkdir(outputInfo.symboldir);
+	//
+	// Leave these commented out since they overwrite the permissions
+	// if the directories already exist. We'll assume they're already
+	// created by the bash shell scripts.
+	//
+	//_mkdir(outputdir);
+	//_mkdir(outputInfo.tradedir);
+	//_mkdir(outputInfo.exgquotedir);
+	//_mkdir(outputInfo.mmquotedir);
+	//_mkdir(outputInfo.symboldir);
 
 	// Create Output File Names
 	sprintf(outputInfo.tradefname, "%s\\%s_TRADES.csv", outputInfo.tradedir, fname);
