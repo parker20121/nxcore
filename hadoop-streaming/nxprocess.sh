@@ -14,22 +14,20 @@
 #
 #
 
-FILEPATH=$1
-	
-	# Data directory on HDFS
+        # Data directory on HDFS
 HDFS_DATA_DIR=hdfs://data/nxcore
 HDFS_UPLOAD_DIR=hdfs://SummerCamp2015/nxcore/decompressed
 
-	# Linux HDFS Fuse mount path
+        # Linux HDFS Fuse mount path
 HDFS_FUSE_DIR=/mnt/data
 
-	# Wine location holding NXCORE binaries
-WINDOWS_NXCORE_DIR=C:\\Projects\\nxcore
-	
-	# Wine location storing data. Need to symbolic link Linux HDFS directory to here.
-WINDOWS_DATA_DIR=C:\\Projects\\nxcore\\data
+        # Wine location holding NXCORE binaries
+WINDOWS_NXCORE_DIR=c:\\Projects\\nxcore
 
-	#Derive directory and file metadata. Filenames have the following form: 20140101.XA.nxc
+        # Wine location storing data. Need to symbolic link Linux HDFS directory to here.
+WINDOWS_DATA_DIR=c:\\Projects\\nxcore\\data
+
+        #Derive directory and file metadata. Filenames have the following form: 20140101.XA.nxc
 FILENAME="${FILEPATH##*/}"
 YEAR="${FILENAME:0:4}"
 MONTH="${FILENAME:4:2}"
@@ -38,49 +36,61 @@ DAY="${FILENAME:6:2}"
 
 # echo "Processing $1..." > ./nxprocess.log
 
-if [ ! -d "~/.wine/dosdevices/$WINDOWS_DATA_DIR" ]; then
-	echo ln -s ${HDFS_FUSE_DIR} ${WINDOWS_DATA_DIR}
-fi
+#if [ ! -d "~/.wine/dosdevices/$WINDOWS_DATA_DIR" ]; then
+#       echo ln -s ${HDFS_FUSE_DIR} ${WINDOWS_DATA_DIR}
+#fi
 
-echo wine ${WINDOWS_NXCORE_DIR}\\nxcore.exe ${WINDOWS_DATA_DIR}\\${FILENAME}
+while read FILENAME; do
 
-echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
-	  -Dmapred.output.compress=true \
-	  -Dmapred.compress.map.output=true \
-	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
-	  -Dmapred.reduce.tasks=0 \
-	  -input ${HDFS_DATA_DIR}/processed/trades/${FILENAME}_TRADES.CSV \
-	  -output ${HDFS_UPLOAD_DIR}/trades/${YEAR}/${MONTH}/${FILENAME}_TRADES.csv.bz2 \
-	  -mapper "cut -f 2"
+   echo "Processing ${FILENAME}..."
+   echo "NXCORE: ${WINDOWS_NXCORE_DIR}\\nxcore.exe"
+   echo "  FILE: ${WINDOWS_DATA_DIR}\\${FILENAME}"
+   echo "OUTPUT: /mnt/hdfs/data/nxcore/processed/${FILENAME}.txt.bz2"
 
-echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
-	  -Dmapred.output.compress=true \
-	  -Dmapred.compress.map.output=true \
-	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
-	  -Dmapred.reduce.tasks=0 \
-	  -input ${HDFS_DATA_DIR}/processed/exgquote/${FILENAME}_EXGQUOTE.CSV \
-	  -output ${HDFS_UPLOAD_DIR}/exgquotes/${YEAR}/${MONTH}/${FILENAME}_EXGQUOTE.csv.bz2 \
-	  -mapper "cut -f 2"
+   wine "${WINDOWS_NXCORE_DIR}\\nxcore.exe ${WINDOWS_DATA_DIR}\\${FILENAME}" | bzip2 -9 > /mnt/hdfs/data/nxcore/processed/$FILENAME.txt.bz2
 
-echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
-	  -Dmapred.output.compress=true \
-	  -Dmapred.compress.map.output=true \
-	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
-	  -Dmapred.reduce.tasks=0 \
-	  -input ${HDFS_DATA_DIR}/processed/mmquote/${FILENAME}_MMQUOTE.CSV \
-	  -output ${HDFS_UPLOAD_DIR}/mmquotes/${YEAR}/${MONTH}/${FILENAME}_MMQUOTE.csv.bz2 \
-	  -mapper "cut -f 2"
+   echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
+          -Dmapred.output.compress=true \
+          -Dmapred.compress.map.output=true \
+          -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
+          -Dmapred.reduce.tasks=0 \
+          -input ${HDFS_DATA_DIR}/processed/trades/${FILENAME}_TRADES.CSV \
+          -output ${HDFS_UPLOAD_DIR}/trades/${YEAR}/${MONTH}/${FILENAME}_TRADES.csv.bz2 \
+          -mapper "cut -f 2"
 
-echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
-	  -Dmapred.output.compress=true \
-	  -Dmapred.compress.map.output=true \
-	  -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
-	  -Dmapred.reduce.tasks=0 \
-	  -input ${HDFS_DATA_DIR}/processed/symbolchange/${FILENAME}_SYMBOLCHANGE.CSV \
-	  -output ${HDFS_UPLOAD_DIR}/symbolchages/${YEAR}/${MONTH}/${FILENAME}_SYMBOLCHANGE.csv.bz2 \
-	  -mapper "cut -f 2"
+   echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
+          -Dmapred.output.compress=true \
+          -Dmapred.compress.map.output=true \
+          -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
+          -Dmapred.reduce.tasks=0 \
+          -input ${HDFS_DATA_DIR}/processed/exgquote/${FILENAME}_EXGQUOTE.CSV \
+          -output ${HDFS_UPLOAD_DIR}/exgquotes/${YEAR}/${MONTH}/${FILENAME}_EXGQUOTE.csv.bz2 \
+          -mapper "cut -f 2"
 
-echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/trades/${FILENAME}_TRADES.CSV
-echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/exgquote/${FILENAME}_EXGQUOTE.CSV
-echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/mmquote/${FILENAME}_MMQUOTE.CSV
-echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/symbolchange/${FILENAME}_SYMBOLCHANGE.CSV
+   echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
+          -Dmapred.output.compress=true \
+          -Dmapred.compress.map.output=true \
+          -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
+          -Dmapred.reduce.tasks=0 \
+          -input ${HDFS_DATA_DIR}/processed/mmquote/${FILENAME}_MMQUOTE.CSV \
+          -output ${HDFS_UPLOAD_DIR}/mmquotes/${YEAR}/${MONTH}/${FILENAME}_MMQUOTE.csv.bz2 \
+          -mapper "cut -f 2"
+
+   echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
+          -Dmapred.output.compress=true \
+          -Dmapred.compress.map.output=true \
+          -Dmapred.output.compression.codec=org.apache.hadoop.io.compress.BZip2Codec \
+          -Dmapred.reduce.tasks=0 \
+          -input ${HDFS_DATA_DIR}/processed/symbolchange/${FILENAME}_SYMBOLCHANGE.CSV \
+          -output ${HDFS_UPLOAD_DIR}/symbolchages/${YEAR}/${MONTH}/${FILENAME}_SYMBOLCHANGE.csv.bz2 \
+          -mapper "cut -f 2"
+
+   echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/trades/${FILENAME}_TRADES.CSV
+   echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/exgquote/${FILENAME}_EXGQUOTE.CSV
+   echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/mmquote/${FILENAME}_MMQUOTE.CSV
+   echo hadoop fs -rm -skipTrash ${HDFS_DATA_DIR}/processed/symbolchange/${FILENAME}_SYMBOLCHANGE.CSV
+
+   echo "Done processing ${FILENAME}."
+
+done
+
