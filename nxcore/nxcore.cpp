@@ -126,6 +126,7 @@ int processNxCoreTrade(const NxCoreSystem* pNxCoreSys, const NxCoreMessage* pNxC
 	//			Analysis SigHiLo Seconds, Analysis QteMatchDistanceRGN, Analysis QteMatchDistanceBBO,
 	//			Analysis QteMatchFlagsBBO, Analysis QteMatchFlagRGN, Analysis QteMatchTypeBBO,
 	//			Analysis QteMatchTypeRGN
+	cout << "trade" << "\t";
 	cout << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
 	cout << setfill('0') << setw(2) << (int)d.Month << "-";
 	cout << setfill('0') << setw(2) << (int)d.Day << "\t";
@@ -199,6 +200,7 @@ int processNxCoreExgQuote(const NxCoreSystem* pNxCoreSys, const NxCoreMessage* p
 	getSymbol(pNxCoreMsg, symbol);
 
 	// Output
+	cout << "exgquote" << "\t";
 	cout << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
 	cout << setfill('0') << setw(2) << (int)d.Month << "-";
 	cout << setfill('0') << setw(2) << (int)d.Day << "\t";
@@ -288,6 +290,7 @@ int processNxCoreMMQuote(const NxCoreSystem* pNxCoreSys, const NxCoreMessage* pN
 	char* p = buf;
 
 	// Output
+	cout << "mmquote" << "\t";
 	cout << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
 	cout << setfill('0') << setw(2) << (int)d.Month << "-";
 	cout << setfill('0') << setw(2) << (int)d.Day << "\t";
@@ -384,6 +387,8 @@ int processNxCoreSymbolChange(const NxCoreSystem* pNxCoreSys, const NxCoreMessag
 		break;
 	}
 	}
+
+	cout << "symbolchange" << "\t";
 	cout << (int)d.Year << "-";									// System Date (yyyy-mm-dd)
 	cout << setfill('0') << setw(2) << (int)d.Month << "-";
 	cout << setfill('0') << setw(2) << (int)d.Day << "\t";
