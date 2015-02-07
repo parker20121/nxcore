@@ -439,10 +439,10 @@ int main(int argc, char** argv)
 	//_mkdir(outputInfo.symboldir);
 
 	// Create Output File Names
-	sprintf(outputInfo.tradefname, "%s\\%s_TRADES.csv", outputInfo.tradedir, fname);
-	sprintf(outputInfo.exgquotefname, "%s\\%s_EXGQUOTE.csv", outputInfo.exgquotedir, fname);
-	sprintf(outputInfo.mmquotefname, "%s\\%s_MMQUOTE.csv", outputInfo.mmquotedir, fname);
-	sprintf(outputInfo.symbolfname, "%s\\%s_SYMBOLCHANGE.csv", outputInfo.symboldir, fname);
+	//sprintf(outputInfo.tradefname, "%s\\%s_TRADES.csv", outputInfo.tradedir, fname);
+	//sprintf(outputInfo.exgquotefname, "%s\\%s_EXGQUOTE.csv", outputInfo.exgquotedir, fname);
+	//sprintf(outputInfo.mmquotefname, "%s\\%s_MMQUOTE.csv", outputInfo.mmquotedir, fname);
+	//sprintf(outputInfo.symbolfname, "%s\\%s_SYMBOLCHANGE.csv", outputInfo.symboldir, fname);
 
 	// Open File Handles
 	outFiles.tradeStream.open(outputInfo.tradefname,std::ios::trunc);
