@@ -47,7 +47,7 @@ while read FILENAME; do
    echo "  FILE: ${WINDOWS_DATA_DIR}\\${FILENAME}"
    echo "OUTPUT: /mnt/hdfs/data/nxcore/processed/${FILENAME}.txt.bz2"
 
-   wine "${WINDOWS_NXCORE_DIR}\\nxcore.exe ${WINDOWS_DATA_DIR}\\${FILENAME}" | bzip2 -9 > /mnt/hdfs/data/nxcore/processed/$FILENAME.txt.bz2
+   wine "${WINDOWS_NXCORE_DIR}\\nxcore.exe ${WINDOWS_DATA_DIR}\\${FILENAME}" | bzip2 -c9 > /mnt/hdfs/data/nxcore/processed/$FILENAME.txt.bz2
 
    echo hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-streaming-0.20.2-cdh3u2.jar \
           -Dmapred.output.compress=true \
