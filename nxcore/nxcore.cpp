@@ -445,10 +445,10 @@ int main(int argc, char** argv)
 	//sprintf(outputInfo.symbolfname, "%s\\%s_SYMBOLCHANGE.csv", outputInfo.symboldir, fname);
 
 	// Open File Handles
-	outFiles.tradeStream.open(outputInfo.tradefname,std::ios::trunc);
-	outFiles.qExgStream.open(outputInfo.exgquotefname, std::ios::trunc);
-	outFiles.qMmStream.open(outputInfo.mmquotefname, std::ios::trunc);
-	outFiles.symStream.open(outputInfo.symbolfname, std::ios::trunc);
+	outFiles.tradeStream.open(outputInfo.tradefname,std::ios::app);
+	outFiles.qExgStream.open(outputInfo.exgquotefname, std::ios::app);
+	outFiles.qMmStream.open(outputInfo.mmquotefname, std::ios::app);
+	outFiles.symStream.open(outputInfo.symbolfname, std::ios::app);
 
 	printf("Directory: %s%s\tTape: %s%s\n", drive, dir, fname, ext);
 	//nxCoreClass.ProcessTape(argv[1], 0, NxCF_EXCLUDE_CRC_CHECK+NxCF_EXCLUDE_QUOTES+NxCF_EXCLUDE_QUOTES2+NxCF_EXCLUDE_OPRA, 0, OnNxCoreCallback);
