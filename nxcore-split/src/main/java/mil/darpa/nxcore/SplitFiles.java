@@ -113,10 +113,13 @@ public class SplitFiles {
         GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
         
         String[] remainingArgs = optionParser.getRemainingArgs();
-        if (!(remainingArgs.length != 3)) {
-          System.err.println("Usage: SplitFiles <in> <out>");
-          System.exit(0);
-        }
+        
+        System.out.println("Remaining args length: " + remainingArgs.length );
+        
+        //if (!(remainingArgs.length != 3)) {
+        //  System.err.println("Usage: SplitFiles <in> <out>");
+        //  System.exit(0);
+        //}
     
         Job job = Job.getInstance(conf,"split-nxcore-files");
         job.setJarByClass(SplitFiles.class);
