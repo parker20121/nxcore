@@ -33,20 +33,24 @@ public class SplitFiles {
      */
     public static class SplitFilesMapper extends Mapper<LongWritable, Text, Text, Text>{
 
+        public static final int RECORD_DATE = 0;
         public static final int RECORD_TYPE = 0;
         public static final int RECORD = 1;
         
         @Override
         protected void map( LongWritable key, Text value, Context context ) throws IOException, InterruptedException {  
             
-                //Go from 20140101.XA.nvc.txt.bz2 -> 20140101
-            String filekey = ((FileSplit) context.getInputSplit()).getPath().getName().substring(0,8);           
-            
                 //Split record type, record
             String[] components = value.toString().split(",",1);     
             
+                //Go from 20140101.XA.nvc.txt.bz2 -> 20140101
+            String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
+            String[] filenameComponents = filename.split("\\.");
+            System.out.println("Filename: " + filename + " component 0:" + filenameComponents[0] );
+            String filekey = filenameComponents[RECORD_DATE] + "-" + components[RECORD_TYPE];
+                        
                 //Segment data by file. 
-            Text filesplit = new Text( filekey + "-" + components[RECORD_TYPE] );            
+            Text filesplit = new Text( filekey );            
             context.write( filesplit, new Text(components[RECORD]) );    
             
         }
