@@ -58,6 +58,9 @@ public class SplitFiles {
      */
     public static class SplitFilesReducer extends Reducer<Text,Text,NullWritable,Text> {
         
+        public static final int RECORD_TYPE = 1;
+        public static final int RECORD_DATE = 0;
+        
         MultipleOutputs<NullWritable,Text> mos;
         
         @Override
@@ -71,18 +74,18 @@ public class SplitFiles {
         protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
          
             String[] components = key.toString().split("-",1);
-            String year = components[0].substring(0,4);
-            String month = components[0].substring(4,6);
+            String year = components[RECORD_DATE].substring(0,4);
+            String month = components[RECORD_DATE].substring(4,6);
             
             StringBuffer outfile = new StringBuffer();
             outfile.append("/")
-                   .append( components[1] )
+                   .append( components[RECORD_TYPE] )  
                    .append("/")
                    .append( year )
                    .append("/")
                    .append( month )
                    .append("/")
-                   .append( components[0 ]);
+                   .append( components[RECORD_DATE]);  //date
             
             for ( Text value : values ){
                 mos.write( NullWritable.get(), value, outfile.toString() );
@@ -112,7 +115,7 @@ public class SplitFiles {
         String[] remainingArgs = optionParser.getRemainingArgs();
         if (!(remainingArgs.length != 2)) {
           System.err.println("Usage: SplitFiles <in> <out>");
-          System.exit(2);
+          System.exit(0);
         }
     
         Job job = Job.getInstance(conf,"split-nxcore-files");
