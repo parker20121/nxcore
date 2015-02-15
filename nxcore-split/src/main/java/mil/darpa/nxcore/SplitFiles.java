@@ -113,7 +113,7 @@ public class SplitFiles {
         GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
         
         String[] remainingArgs = optionParser.getRemainingArgs();
-        if (!(remainingArgs.length != 2)) {
+        if (!(remainingArgs.length != 3)) {
           System.err.println("Usage: SplitFiles <in> <out>");
           System.exit(0);
         }
