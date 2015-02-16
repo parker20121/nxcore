@@ -14,6 +14,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
@@ -136,7 +137,8 @@ public class SplitFiles {
         job.setReducerClass(SplitFiles.SplitFilesReducer.class);
         job.setOutputKeyClass(LongWritable.class);
         job.setOutputValueClass(Text.class);
-        
+        job.setInputFormatClass(TextInputFormat.class);
+       
         List<String> otherArgs = new ArrayList<String>();
         for (int i=0; i < remainingArgs.length; ++i) {
           otherArgs.add(remainingArgs[i]);
