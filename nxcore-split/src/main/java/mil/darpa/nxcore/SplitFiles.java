@@ -18,6 +18,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -28,11 +29,15 @@ import org.apache.hadoop.util.GenericOptionsParser;
  */
 public class SplitFiles {
     
+    private static final Logger log = Logger.getLogger(SplitFiles.class);
+    
     /**
      * Spilt the file data into the four separate data types.
      */
     public static class SplitFilesMapper extends Mapper<LongWritable, Text, Text, Text>{
 
+        private static final Logger log = Logger.getLogger(SplitFilesMapper.class);
+        
         public static final int RECORD_DATE = 0;
         public static final int RECORD_TYPE = 0;
         public static final int RECORD = 1;
@@ -41,12 +46,12 @@ public class SplitFiles {
         protected void map( LongWritable key, Text value, Context context ) throws IOException, InterruptedException {  
             
                 //Split record type, record
-            String[] components = value.toString().split(",",1);     
+            String[] components = value.toString().split(",",2);     
             
                 //Go from 20140101.XA.nvc.txt.bz2 -> 20140101
             String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
             String[] filenameComponents = filename.split("\\.");
-            System.out.println("Filename: " + filename + " component 0:" + filenameComponents[0] );
+            log.info("Filename: " + filename + " component 0:" + filenameComponents[0] );
             String filekey = filenameComponents[RECORD_DATE] + "-" + components[RECORD_TYPE];
                         
                 //Segment data by file. 
@@ -61,6 +66,8 @@ public class SplitFiles {
      * Aggregate records into files by day and record type.
      */
     public static class SplitFilesReducer extends Reducer<Text,Text,NullWritable,Text> {
+        
+        private static final Logger log = Logger.getLogger(SplitFilesReducer.class);
         
         public static final int RECORD_TYPE = 1;
         public static final int RECORD_DATE = 0;
@@ -77,11 +84,14 @@ public class SplitFiles {
         @Override
         protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
          
-            String[] components = key.toString().split("-",1);
+            String[] components = key.toString().split("-",2);
+            log.info("components: " + components[0] + "  components: " + components[1] );
+                     
             String year = components[RECORD_DATE].substring(0,4);
             String month = components[RECORD_DATE].substring(4,6);
+            log.info("year: " + year + " month:" + month );
             
-            StringBuffer outfile = new StringBuffer();
+            StringBuilder outfile = new StringBuilder();
             outfile.append("/")
                    .append( components[RECORD_TYPE] )  
                    .append("/")
@@ -89,7 +99,9 @@ public class SplitFiles {
                    .append("/")
                    .append( month )
                    .append("/")
-                   .append( components[RECORD_DATE]);  //date
+                   .append( components[RECORD_DATE] );  //date
+            
+            log.info("outfile: " + outfile.toString() );
             
             for ( Text value : values ){
                 mos.write( NullWritable.get(), value, outfile.toString() );
@@ -116,14 +128,7 @@ public class SplitFiles {
         Configuration conf = new Configuration();
         GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
         
-        String[] remainingArgs = optionParser.getRemainingArgs();
-        
-        System.out.println("Remaining args length: " + remainingArgs.length );
-        
-        //if (!(remainingArgs.length != 3)) {
-        //  System.err.println("Usage: SplitFiles <in> <out>");
-        //  System.exit(0);
-        //}
+        String[] remainingArgs = optionParser.getRemainingArgs();               
     
         Job job = Job.getInstance(conf,"split-nxcore-files");
         job.setJarByClass(SplitFiles.class);
