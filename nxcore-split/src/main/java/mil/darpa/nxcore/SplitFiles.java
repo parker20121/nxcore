@@ -130,18 +130,22 @@ public class SplitFiles {
         
         String[] remainingArgs = optionParser.getRemainingArgs();               
     
-        Job job = Job.getInstance(conf,"split-nxcore-files");
+        Job job = Job.getInstance(conf, "split-nxcore-files");
         job.setJarByClass(SplitFiles.class);
+        
         job.setMapperClass(SplitFiles.SplitFilesMapper.class);
         job.setReducerClass(SplitFiles.SplitFilesReducer.class);
+        
+        job.setInputFormatClass(TextInputFormat.class);        
+        
         job.setOutputKeyClass(NullWritable.class);
-        job.setOutputValueClass(Text.class);
-        job.setInputFormatClass(TextInputFormat.class);
+        job.setOutputValueClass(Text.class);        
+        job.setOutputFormatClass(TextOutputFormat.class);
         
         List<String> otherArgs = new ArrayList<String>();
-        for (int i=0; i < remainingArgs.length; ++i) {
-          otherArgs.add(remainingArgs[i]);
-        }
+        //for (int i=0; i < remainingArgs.length; ++i) {
+        //  otherArgs.add(remainingArgs[i]);
+        //}
     
         FileInputFormat.addInputPath(job, new Path( otherArgs.get(0) ));
         FileOutputFormat.setOutputPath(job, new Path( otherArgs.get(1) ));
