@@ -55,9 +55,8 @@ public class SplitFiles {
             log.info("Filename: " + filename + " component 0:" + filenameComponents[0] );
             String filekey = filenameComponents[RECORD_DATE] + "-" + components[RECORD_TYPE];
                         
-                //Segment data by file. 
-            Text filesplit = new Text( filekey );            
-            context.write( filesplit, new Text(components[RECORD]) );    
+                //Segment data by file.           
+            context.write( new Text(filekey), new Text(components[RECORD]) );    
             
         }
   
@@ -135,10 +134,10 @@ public class SplitFiles {
         job.setJarByClass(SplitFiles.class);
         job.setMapperClass(SplitFiles.SplitFilesMapper.class);
         job.setReducerClass(SplitFiles.SplitFilesReducer.class);
-        job.setOutputKeyClass(LongWritable.class);
+        job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);
         job.setInputFormatClass(TextInputFormat.class);
-       
+        
         List<String> otherArgs = new ArrayList<String>();
         for (int i=0; i < remainingArgs.length; ++i) {
           otherArgs.add(remainingArgs[i]);
