@@ -136,6 +136,9 @@ public class SplitFiles {
         job.setMapperClass(SplitFiles.SplitFilesMapper.class);
         job.setReducerClass(SplitFiles.SplitFilesReducer.class);
         
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+        
         job.setInputFormatClass(TextInputFormat.class);        
         
         job.setOutputKeyClass(NullWritable.class);
