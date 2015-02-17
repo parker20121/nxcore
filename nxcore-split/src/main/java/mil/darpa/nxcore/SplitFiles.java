@@ -46,17 +46,22 @@ public class SplitFiles {
         @Override
         protected void map( LongWritable key, Text value, Context context ) throws IOException, InterruptedException {  
             
-                //Split record type, record
-            String[] components = value.toString().split(",",2);     
-            
-                //Go from 20140101.XA.nvc.txt.bz2 -> 20140101
-            String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
-            String[] filenameComponents = filename.split("\\.");
-            log.info("Filename: " + filename + " component 0:" + filenameComponents[0] );
-            String filekey = filenameComponents[RECORD_DATE] + "-" + components[RECORD_TYPE];
-                        
-                //Segment data by file.           
-            context.write( new Text(filekey), new Text(components[RECORD]) );    
+                //Skip header.
+            if ( key.get() > 1 ){
+                
+                    //Split record type, record
+                String[] components = value.toString().split("\\t",2);     
+
+                    //Go from 20140101.XA.nvc.txt.bz2 -> 20140101
+                String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
+                String[] filenameComponents = filename.split("\\.");
+                log.info("Filename: " + filename + " component 0:" + filenameComponents[0] );
+                String filekey = filenameComponents[RECORD_DATE] + "-" + components[RECORD_TYPE];
+
+                    //Segment data by file.           
+                context.write( new Text(filekey), new Text(components[RECORD]) ); 
+                
+            }
             
         }
   
@@ -130,26 +135,26 @@ public class SplitFiles {
         
         String[] remainingArgs = optionParser.getRemainingArgs();               
     
+        for ( int i=0; i< remainingArgs.length; i++ ){
+            System.out.println("remaining args: " + remainingArgs[i] );
+        }
+        
+        System.out.println("Options parser remainging args length: " + optionParser.getRemainingArgs().length );
+        
         Job job = Job.getInstance(conf, "split-nxcore-files");
         job.setJarByClass(SplitFiles.class);
-        
+                
+        job.setInputFormatClass(TextInputFormat.class);        
         job.setMapperClass(SplitFiles.SplitFilesMapper.class);
-        job.setReducerClass(SplitFiles.SplitFilesReducer.class);
-        
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
-        
-        job.setInputFormatClass(TextInputFormat.class);        
-        
+                
+        job.setReducerClass(SplitFiles.SplitFilesReducer.class);
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);        
         job.setOutputFormatClass(TextOutputFormat.class);
         
         List<String> otherArgs = new ArrayList<String>();
-        //for (int i=0; i < remainingArgs.length; ++i) {
-        //  otherArgs.add(remainingArgs[i]);
-        //}
-    
         FileInputFormat.addInputPath(job, new Path( otherArgs.get(0) ));
         FileOutputFormat.setOutputPath(job, new Path( otherArgs.get(1) ));
         
