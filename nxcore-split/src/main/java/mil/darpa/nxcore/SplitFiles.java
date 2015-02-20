@@ -1,8 +1,6 @@
 package mil.darpa.nxcore;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -12,13 +10,10 @@ import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.log4j.Logger;
 
 
@@ -52,15 +47,18 @@ public class SplitFiles {
                     //Split record type, record
                 String[] components = value.toString().split("\\t",2);     
 
-                    //Go from 20140101.XA.nvc.txt.bz2 -> 20140101
-                String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
-                String[] filenameComponents = filename.split("\\.");
-                log.info("Filename: " + filename + " component 0:" + filenameComponents[0] );
-                String filekey = filenameComponents[RECORD_DATE] + "-" + components[RECORD_TYPE];
+                if ( components.length == 2 ){
+                        //Go from 20140101.XA.nvc.txt.bz2 -> 20140101
+                    String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
+                    String[] filenameComponents = filename.split("\\.");
+                    String filekey = filenameComponents[RECORD_DATE] + "-" + components[RECORD_TYPE];
 
-                    //Segment data by file.           
-                context.write( new Text(filekey), new Text(components[RECORD]) ); 
-                
+                        //Segment data by file.           
+                    context.write( new Text(filekey), new Text(components[RECORD]) ); 
+                } else {
+                    System.err.println("Error processing line " + key.toString() + " in " + ((FileSplit) context.getInputSplit()).getPath().getName() );
+                    System.err.println("for value: " + value.toString() );
+                }
             }
             
         }
@@ -87,17 +85,15 @@ public class SplitFiles {
         
        
         @Override
-        protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-         
+        protected void reduce(Text key, Iterable<Text> values, Context ctx) throws IOException, InterruptedException {
+                     
             String[] components = key.toString().split("-",2);
-            log.info("components: " + components[0] + "  components: " + components[1] );
                      
             String year = components[RECORD_DATE].substring(0,4);
             String month = components[RECORD_DATE].substring(4,6);
-            log.info("year: " + year + " month:" + month );
             
             StringBuilder outfile = new StringBuilder();
-            outfile.append("/")
+            outfile.append("/SummerCamp2015/nxcore/split/")
                    .append( components[RECORD_TYPE] )  
                    .append("/")
                    .append( year )
@@ -105,8 +101,6 @@ public class SplitFiles {
                    .append( month )
                    .append("/")
                    .append( components[RECORD_DATE] );  //date
-            
-            log.info("outfile: " + outfile.toString() );
             
             for ( Text value : values ){
                 mos.write( NullWritable.get(), value, outfile.toString() );
@@ -131,16 +125,7 @@ public class SplitFiles {
     public static void main( String[] args ) throws Exception {
         
         Configuration conf = new Configuration();
-        GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
-        
-        String[] remainingArgs = optionParser.getRemainingArgs();               
-    
-        for ( int i=0; i< remainingArgs.length; i++ ){
-            System.out.println("remaining args: " + remainingArgs[i] );
-        }
-        
-        System.out.println("Options parser remainging args length: " + optionParser.getRemainingArgs().length );
-        
+       
         Job job = Job.getInstance(conf, "split-nxcore-files");
         job.setJarByClass(SplitFiles.class);
                 
@@ -153,11 +138,10 @@ public class SplitFiles {
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);        
         job.setOutputFormatClass(TextOutputFormat.class);
+
+        TextInputFormat.addInputPath(job, new Path( args[0] ));
         
-        List<String> otherArgs = new ArrayList<String>();
-        FileInputFormat.addInputPath(job, new Path( otherArgs.get(0) ));
-        FileOutputFormat.setOutputPath(job, new Path( otherArgs.get(1) ));
-        
+        TextOutputFormat.setOutputPath(job, new Path( args[1] ));        
         TextOutputFormat.setCompressOutput(job, true);
         TextOutputFormat.setOutputCompressorClass(job, BZip2Codec.class );
         
