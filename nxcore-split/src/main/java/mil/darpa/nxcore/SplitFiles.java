@@ -1,17 +1,21 @@
 package mil.darpa.nxcore;
 
 import java.io.IOException;
+import org.apache.commons.compress.archivers.dump.DumpArchiveConstants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.BZip2Codec;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.SnappyCodec;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.log4j.Logger;
@@ -27,6 +31,8 @@ public class SplitFiles {
     
     private static final Logger log = Logger.getLogger(SplitFiles.class);
     
+    public static final String NAME = "split-nxcore-files";
+        
     /**
      * Spilt the file data into the four separate data types.
      */
@@ -125,26 +131,32 @@ public class SplitFiles {
     public static void main( String[] args ) throws Exception {
         
         Configuration conf = new Configuration();
-       
-        Job job = Job.getInstance(conf, "split-nxcore-files");
+        conf.setBoolean("mapreduce.map.output.compress", true);
+        conf.setClass("mapreduce.map.output.compress.codec", SnappyCodec.class, CompressionCodec.class);
+        
+        Job job = Job.getInstance(conf, SplitFiles.NAME);
         job.setJarByClass(SplitFiles.class);
                 
         job.setInputFormatClass(TextInputFormat.class);        
         job.setMapperClass(SplitFiles.SplitFilesMapper.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
-                
+        
         job.setReducerClass(SplitFiles.SplitFilesReducer.class);
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);        
-        job.setOutputFormatClass(TextOutputFormat.class);
-
-        TextInputFormat.addInputPath(job, new Path( args[0] ));
+        //job.setOutputFormatClass(TextOutputFormat.class);
+            
+            //Ensure results are rolled up into one file per day.
+        LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
         
+        job.setNumReduceTasks(26*4);
+        
+        TextInputFormat.addInputPath(job, new Path( args[0] ));        
         TextOutputFormat.setOutputPath(job, new Path( args[1] ));        
         TextOutputFormat.setCompressOutput(job, true);
         TextOutputFormat.setOutputCompressorClass(job, BZip2Codec.class );
-        
+                        
         System.exit(job.waitForCompletion(true) ? 0 : 1);
         
     }
