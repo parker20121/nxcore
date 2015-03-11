@@ -29,9 +29,9 @@ Preparation Instructions
 6. Download nxcore files from github to a puppet master directory
 	>> cd /srv
 	>> git clone https://github.com/parker20121/nxcore.git 
-	
+	 
 7. Couldn't find pscp on each machine. Edited xdata-default.pp on puppet master to include the 
-   pssh package. Watied until the puppet master system updated the nodes. Found pscp as 
+   pssh package. Waited until the puppet master system updated the nodes. Found pscp as 
    pscp.pssh on each node now. Not sure if this was necessary.
    
 8. Copy files to wine subdirectory on data nodes from puppet master. From /srv/nxcore on puppet master, 
