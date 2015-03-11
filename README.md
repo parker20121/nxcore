@@ -8,4 +8,4 @@ load data into Hive. The applications are arranged into the following directorie
 | nxcore_msc       | A Visual C++ program to dump data from Encore data files using the NXCORE API.          |
 | hadoop-streaming | Final compiled version of nxcore-msc program, which is run on Linux using Wine.         |
 | nxcore-split     | A MapReduce program to split the files by record type and date.                         |
-| nxcore-hive      | Hive record definitions used to import split files into Hive tables.                    |
+
