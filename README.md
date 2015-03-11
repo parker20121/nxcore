@@ -1,7 +1,7 @@
 # nxcore
 
-This project contains code to read nxcore data files, and additional programs to split and 
-load data into Hive. The applications are arranged into the following directories.
+This project contains code to read nxcore data files, and additional programs to split data
+into separate message types. The applications are arranged into the following directories.
 
 | Directory        | Description                                                                             |
 |------------------|-----------------------------------------------------------------------------------------|
