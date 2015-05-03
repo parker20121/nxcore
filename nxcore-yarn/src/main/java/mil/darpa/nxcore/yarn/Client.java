@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipFile;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.api.ApplicationConstants.Environment;
+import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponse;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
@@ -28,13 +30,19 @@ import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
 
 /**
- *
+ * 
+ * 
  * @author Matt Parker
+ * 
+ * @see <a href="https://github.com/hortonworks/simple-yarn-app">HortonWorks Simple Yarn Application Code</a>
+ * @see <a href="http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html">Writing YARN Applications</a>
+ * 
  */
 public class Client {
 
     public static final String APPLICATION_NAME = "ncore-yarn";
     public static final String JARFILE = "nxcore-yarn-1.0-with-dependencies.jar";
+    public static final String ZIPFILE = "nxcore-scripts.zip";
     public static final String DEFAULT_APPLICATION_QUEUE = "default";
     
     Configuration conf = new YarnConfiguration();
@@ -46,16 +54,18 @@ public class Client {
             System.out.print( args[i] + " ");
         }
         
-        if (args.length != 3) {
-            System.out.println("usage: java -cp " + JARFILE + " mil.darpa.nxcore.yarn.Client [jarpath] [n] [HDFS input dir] [HDFS output dir]");
+        if (args.length != 5) {
+            System.out.println("usage: java -cp " + JARFILE + " mil.darpa.nxcore.yarn.Client [jarpath] [full script path] [number of processors] [HDFS input dir] [HDFS output dir]");
             throw new Exception("Application not properly configured.");
         }
 
-        final String command = "????";
+        final String script = args[1];
         final Path jarPath = new Path(args[0]);
-        final int n = Integer.valueOf(args[1]);
-        final String hdfsInputDirectory = args[2];
-        final String hdfsOutputDirectory = args[3];
+        final ZipFile zipFile = null;
+        final Path zipFilePath = new Path( args[1] );       
+        final int n = Integer.valueOf(args[2]);
+        final String hdfsInputDirectory = args[3];
+        final String hdfsOutputDirectory = args[4];
 
         // Create yarnClient
         YarnConfiguration conf = new YarnConfiguration();
@@ -65,7 +75,11 @@ public class Client {
 
         // Create application via yarnClient
         YarnClientApplication app = yarnClient.createApplication();
-
+        GetNewApplicationResponse appResponse = app.getNewApplicationResponse();
+        
+        Resource max = appResponse.getMaximumResourceCapability();
+        System.out.println("max available - cores: " + max.getVirtualCores() + " mem: " + max.getMemory() );
+        
         // Set up the container launch context for the application master
         ContainerLaunchContext amContainer = Records.newRecord(ContainerLaunchContext.class);
         amContainer.setCommands(
@@ -73,7 +87,7 @@ public class Client {
                         "$JAVA_HOME/bin/java"
                         + " -Xmx256M"
                         + " mil.darpa.nxcore.yarn.ApplicationMaster"
-                        + " " + command
+                        + " " + script 
                         + " " + String.valueOf(n)
                         + " " + hdfsInputDirectory
                         + " " + hdfsOutputDirectory
@@ -83,7 +97,13 @@ public class Client {
         // Setup jar for ApplicationMaster
         LocalResource appMasterJar = Records.newRecord(LocalResource.class);
         setupAppMasterJar(jarPath, appMasterJar);
-        amContainer.setLocalResources( Collections.singletonMap(JARFILE, appMasterJar) );
+        
+        //Setup zip for ApplicationMaster
+        LocalResource scriptJar = Records.newRecord(LocalResource.class);
+        setupAppMasterJar( scriptJar, jarPath );
+        Map<String,LocalResource> localResources = Collections.singletonMap(JARFILE, appMasterJar);
+        localResources.put("", scriptJar );
+        amContainer.setLocalResources( localResources );
 
         // Setup CLASSPATH for ApplicationMaster
         Map<String, String> appMasterEnv = new HashMap<String, String>();
@@ -117,8 +137,7 @@ public class Client {
             appState = appReport.getYarnApplicationState();
         }
 
-        System.out.println("Application " + appId + " finished with" + " state " + appState
-                         + " at " + appReport.getFinishTime());
+        System.out.println("Application " + appId + " finished with" + " state " + appState + " at " + appReport.getFinishTime());
         
     }
 
@@ -130,7 +149,12 @@ public class Client {
         appMasterJar.setType(LocalResourceType.FILE);
         appMasterJar.setVisibility(LocalResourceVisibility.PUBLIC);
     }
-
+    
+    private void setupZipFile(){
+    
+        
+    }
+    
     private void setupAppMasterEnv(Map<String, String> appMasterEnv) {
         
         for (String c : conf.getStrings( YarnConfiguration.YARN_APPLICATION_CLASSPATH, YarnConfiguration.DEFAULT_YARN_APPLICATION_CLASSPATH)) {

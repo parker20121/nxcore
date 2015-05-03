@@ -41,9 +41,9 @@ public class ApplicationMaster {
     nmClient.start();
 
     // Register with ResourceManager
-    System.out.println("registerApplicationMaster 0");
+    System.out.println("Registering ApplicationMaster....");
     rmClient.registerApplicationMaster("", 0, "");
-    System.out.println("registerApplicationMaster 1");
+    System.out.println("Registering ApplicationMaster done.");
     
     // Priority for worker containers - priorities are intra-application
     Priority priority = Records.newRecord(Priority.class);
@@ -57,7 +57,7 @@ public class ApplicationMaster {
     // Make container requests to ResourceManager
     for (int i = 0; i < n; ++i) {
       ContainerRequest containerAsk = new ContainerRequest(capability, null, null, priority);
-      System.out.println("Making res-req " + i);
+      System.out.println("Making resource request " + i);
       rmClient.addContainerRequest(containerAsk);
     }
 
