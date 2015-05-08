@@ -30,9 +30,12 @@ cat $FILELIST | while read FILENAME; do
    echo "Processing ${FILENAME}..."
    echo "NXCORE: ${WINDOWS_NXCORE_DIR}\\nxcore.exe"
    echo "  FILE: ${WINDOWS_DATA_DIR}\\${FILENAME}"
-   echo "OUTPUT: /mnt/hdfs/data/nxcore/processed/${FILENAME}.txt.bz2"
+   echo "  TEMP: /mnt/hdfs/data/nxcore/processed/${FILENAME}.txt.tmp"
+   echo "OUTPUT: /mnt/hdfs/data/nxcore/processed/${FILENAME}.txt"
 
-   wine ${WINDOWS_NXCORE_DIR}\\nxcore.exe ${WINDOWS_DATA_DIR}\\${FILENAME} | bzip2 -c9 > /mnt/hdfs/data/nxcore/processed/$FILENAME.txt.bz2
+   wine ${WINDOWS_NXCORE_DIR}\\nxcore.exe ${WINDOWS_DATA_DIR}\\${FILENAME} > /mnt/hdfs/data/nxcore/processed/$FILENAME.txt.tmp
+
+   mv /mnt/hdfs/data/nxcore/processed/${FILENAME}.txt.tmp /mnt/hdfs/data/nxcore/processed/${FILENAME}.txt
 
    echo "Done processing ${FILENAME}."
 
