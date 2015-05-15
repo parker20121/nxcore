@@ -18,51 +18,51 @@ instructions.
 3. Run 'winecfg' on each data node as the nxcore user. This will initialize the 
    /home/nxcore/.wine directories. 
 
-```	
-pssh -h datanodes runuser -l nxcore -c 'winecfg'
-```
+  ```	
+  pssh -h datanodes runuser -l nxcore -c 'winecfg'
+  ```
 
 4. Make nxcore directory in each data node's Windows/Wine area
 
-```
-pssh -h datanodes mkdir -p /home/nxcore/.wine/drive_c/Projects/nxcore
-```
+  ```
+  pssh -h datanodes mkdir -p /home/nxcore/.wine/drive_c/Projects/nxcore
+  ```
 	
 5. Symbolic link HDFS Fuse mount to Windows/Wine directory
-```
-pssh -h datanodes ln -s /mnt/hdfs/data/nxcore /home/nxcore/.wine/drive_c/Projects/nxcore/data
-```
+  ```
+  pssh -h datanodes ln -s /mnt/hdfs/data/nxcore /home/nxcore/.wine/drive_c/Projects/nxcore/data
+  ```
 
 6. Download nxcore files from github to a puppet master directory
-```
-cd /srv
-git clone https://github.com/parker20121/nxcore.git 
-```	 
+  ```
+  cd /srv
+  git clone https://github.com/parker20121/nxcore.git 
+  ```	 
 
 7. Couldn't find pscp on each machine. Edited xdata-default.pp on puppet master to include the 
    pssh package. Waited until the puppet master system updated the nodes. Found pscp as 
    pscp.pssh on each node now. Not sure if this was necessary.
    
 8. Copy files to wine subdirectory on data nodes from puppet master. From /srv/nxcore on puppet master, 
-```
-pscp.pssh -h /root/xdata-cluster/datanodes  hadoop-streaming/* /home/nxcore/.wine/drive_c/Projects/nxcore
-```
+  ```
+  pscp.pssh -h /root/xdata-cluster/datanodes  hadoop-streaming/* /home/nxcore/.wine/drive_c/Projects/nxcore
+  ```
 
 9. Ensure the new directories are owned by nxcore.
-```
-pssh -h /root/xdata-cluster/datanodes chown -R nxcore:nxcore /home/nxcore/.wine/drive_c
-```
+  ```
+  pssh -h /root/xdata-cluster/datanodes chown -R nxcore:nxcore /home/nxcore/.wine/drive_c
+  ```
 	
 ## Testing
 
 1. Copy a subset of files to the shared directory for testing
-```
-hadoop fs -cp /SummerCamp2015/nxcore/2014010[1-5].XA.nxc /data/nxcore/
-```
+  ```
+  hadoop fs -cp /SummerCamp2015/nxcore/2014010[1-5].XA.nxc /data/nxcore/
+  ```
 
 2. Running the hadoop streaming command to process the test data
-```
-hadoop -jar /usr/lib/hadoop-mapreduce/hadoop-streaming-2.5.0-cdh5.3.0.jar \
+  ```
+  hadoop -jar /usr/lib/hadoop-mapreduce/hadoop-streaming-2.5.0-cdh5.3.0.jar \
         -D mapred.min.split.size=1000737418240 \
         -D mapred.reduce.tasks=5 \
         -D mapred.job.name="nxcore_extract" \
@@ -72,4 +72,4 @@ hadoop -jar /usr/lib/hadoop-mapreduce/hadoop-streaming-2.5.0-cdh5.3.0.jar \
 	-mapper nxprocess.sh  \
 	-verbose 
 	-file /home/nxcore/.wine/drive_c/Projects/nxcore/nxprocess.sh
-```			
+  ```			
