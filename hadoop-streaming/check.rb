@@ -2,10 +2,17 @@
 
 require 'socket'
 
-processing_dir = "/mnt/hdfs/data/nxcore/processed"
+processing_dir = "/mnt/hdfs/data/nxcore/processed/2014/08"
 processing = Dir["#{processing_dir}/*.tmp"]
 processed = Dir["#{processing_dir}/*.bz2"]
-filelists = Dir["/mnt/hdfs/data/nxcore/filelist/*.txt"]
+to_process = Dir["/mnt/hdfs/SummerCamp2015/nxcore/raw/dataset1/*.*"]
+filelists = Dir["/mnt/hdfs/data/nxcore/filelist/2014/08/*.txt"]
+
+puts "total file to process: #{to_process.size}\n"
+puts "files processed: #{processed.size}\n"
+puts "files processing: #{processing.size}\n"
+puts "files remaining: #{to_process.size-processed.size-processing.size}\n"
+puts "configuration files: #{filelists.size}\n"
 
 # puts "#{processed.to_s}\n"
 
@@ -17,12 +24,17 @@ filelists.each do | filelist |
 
    processed_file = ""
    processing_file = ""
+   processing_file_index = -1
 
    host = filelist.scan(/(r\d\d\du\d\d)/)
 
    # puts "host: #{host}\n"
 
-   File.open(filelist,'r').readlines.each do | file |
+   file_count = 0
+
+   File.open(filelist,'r').readlines.each_with_index do | file, index |
+
+        file_count = file_count + 1
 
         # puts "\tfile: #{file}\n"
 
@@ -33,17 +45,19 @@ filelists.each do | filelist |
 
         if processed.include? processed_filename 
            processed_file = processed_filename
+           processing_file_index = index + 1
         elsif processing.include? processing_filename
            processing_file = processing_filename
+           processing_file_index = index + 1
         else
            # due nothing          
         end
    end
 
    if processing_file != ""
-      puts "#{host}: still processing :#{processing_file}. Last processed file: #{processed_file}\n"
+      puts "#{host}: still processing #{processing_file_index} of #{file_count} :#{processing_file}. Last processed file: #{processed_file}\n"
    elsif processed_file != ""
-      puts "#{host}: last processed file - #{processed_file}. Process is done.\n"
+      puts "#{host}: last processed file - #{processed_file}. Process is done. #{file_count} files total.\n"
    else
       puts "#{host}: cannot find any processed files\n"
    end
